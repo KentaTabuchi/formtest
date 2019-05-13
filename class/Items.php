@@ -8,10 +8,15 @@ class Items{
     public $consultTitle;
     public $consultContents;
 
+    public $errMessages;
+    public $whereErr;
     /**
      * 投稿内容をコンストラクタでメンバ変数に移す
      */
     public function __construct(){
+        
+        $this->errMessages = new stdClass();
+        
         if(isset($_POST['name'])){
             $this->name =$_POST['name'];
         }else{
@@ -46,25 +51,72 @@ class Items{
     }
     /**
      * 送信前に入力ミスのチェックを行う
-     * @return 問題なければ true 漏れがあれば false を返す
      */
     public function errCheck(){
-        $isValidated = true;
+        $this->whereErr = "";
 
         if(empty($this->name) || empty($this->phone) || empty($this->address) || empty($this->whichConsult)){
-            $isValidated = false;
+            $this->whereErr .= "未入力項目が残っています。</br>";
         }
         if(ctype_digit($this->phone) == false){
-            $isValidated = false;
+            $this->whereErr .= "電話番号に数字以外が入っています。</br>";
         }
-        if($this->$address != $this->readdress){
-            $isValidated = false;
+        if($this->address != $this->readdress){
+            $this->whereErr .= "確認したアドレスと一致していません。</br>";
         }
         if(preg_match('/..*@.*\..*/',$this->address) == false){
-            $isValidated = false;
+            $this->whereErr .= "メールアドレスが間違っています。</br>";
+        }
+   
+    }
+    /**
+     * フォームの各項目の入力ミスに対するメッセージを　項目名->エラーメッセージ　の　辞書構造体に返す
+     */
+    public function createErrorMessages(){
+        if (empty($this->name)) {
+            $this->errMessages->nameEmptyErr = "※未入力";}
+        else{
+            $this->errMessages->nameEmptyErr = "";
+        }
+        if (empty($this->phone)) {
+            $this->errMessages->phoneEmptyErr = "※未入力";
+        }
+        else{
+            $this->errMessages->phoneEmptyErr = "";
+        }
+        if (!(ctype_digit($this->phone))){ 
+            $this->errMessages->phoneNumericErr = "※ハイフン抜きで数字だけ入力てください。";
+        }
+        else{
+            $this->errMessages->phoneNumericErr = "";
+        }
+        if (empty($this->address)) {
+            $this->errMessages->addressEmptyErr = "※未入力";
+        }
+        else{
+            $this->errMessages->addressEmptyErr = "";
+        }
+        if (preg_match('/..*@.*\..*/',$this->address) == false){
+            $this->errMessages->mailPatternErr = "※メールの形式になっていません。";
+        }
+        else{
+            $this->errMessages->mailPatternErr = "";
+        }
+        if (empty($this->consultTitle)) {
+            $this->errMessages->isConsultEmptyErr = "※未入力";
+        }
+        else{
+            $this->errMessages->isConsultEmptyErr = "";
         }
         
-        return $isValidated;
+        if($this->address != $this->readdress) {
+            $this->errMessages->notMatchErr = "※アドレスが一致しません";
+        }
+        else{
+            $this->errMessages->notMatchErr = "";
+        }
+    
+
     }
     /**
      * 投稿内容を整形してメール本文を作成
@@ -72,7 +124,7 @@ class Items{
      */
     public function makeMailBody(){
         
-        if($this->whichConsult == "1"){
+        if($this->consultTitle == "1"){
             $this->consultItem = "無料のご相談";
         }
         else{
