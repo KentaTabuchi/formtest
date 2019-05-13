@@ -1,64 +1,29 @@
 <?php
-    $name = $_POST['name'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
-    $readdress = $_POST['readdress'];
-    $isConsult = $_POST['isConsult'];
-    $consultContents = $_POST['consultContents'];
+    require_once (dirname(__FILE__)."\class\Items.php");
+    
+    $items = new Items($_POST);
+
+    $name = $items->name;
+    $phone = $items->phone;
+    $address = $items->address;
+    $readdress = $items->readdress;
+    $consultTitle = $items->consultTitle;
+    $consultContents = $items->consultContents;
 
     if (empty($name)) $nameEmptyErr = "※未入力";
     if (empty($phone)) $phoneEmptyErr = "※未入力";
     if (ctype_digit($phone) == false) $phoneNumericErr = "※ハイフン抜きで数字だけ入力てください。"; 
     if (empty($address)) $addressEmptyErr = "※未入力";
     if(preg_match('/..*@.*\..*/',$address) == false) $mailPatternErr = "※メールの形式になっていません。";
-    if (empty($isConsult)) $isConsultEmptyErr = "※未入力";
+    if (empty($consultTitle)) $isConsultEmptyErr = "※未入力";
 
-    if($_POST['address'] != $_POST['readdress']) $notMatchErr = "※アドレスが一致しません";
+    if($items->address != $items->consultContents) $notMatchErr = "※アドレスが一致しません";
 
-    if($_POST['isConsult']==1) $leftCheck = 'checked';
+    if($_POST['consultTitle']==1) $leftCheck = 'checked';
         else $leftCheck = '';
-    if($_POST['isConsult']==2) $rightCheck = 'checked';
+    if($_POST['consultTitle']==2) $rightCheck = 'checked';
         else $rightCheck = '';
     
-    function errCheck($name,$phone,$address,$readdress,$isConsult){
-        $validated = true;
-
-        if(empty($name) || empty($phone) || empty($address) || empty($isConsult)){
-            $validated = false;
-        }
-        if(ctype_digit($phone) == false){
-            $validated = false;
-        }
-        if($address != $readdress){
-            $validated = false;
-        }
-        if(preg_match('/..*@.*\..*/',$address) == false){
-            $validated = false;
-        }
-        
-        return $validated;
-    }
-    function makeMailBody($name,$phone,$address,$isConsult,$consultContents){
-        
-        if($isConsult == "1"){
-            $consultItem = "無料のご相談";
-        }
-        else{
-            $consultItem ="その他のご質問";
-        }
-        
-        $mailBody = "
----------------------------------------------------------------
-【お名前】 $name
-【お電話番号】 $phone
-【メールアドレス】 $address
-【ご相談項目】 $consultItem
-【ご相談内容】
-$consultContents
----------------------------------------------------------------
-        ";
-        return $mailBody;
-    }
     function sendMail($to,$message){
         mb_language("Japanese");
         mb_internal_encoding("UTF-8");
@@ -75,9 +40,9 @@ $consultContents
         
     }
 
-    if(errCheck($name,$phone,$address,$readdress,$isConsult)){
-        $result1 = sendMail("morita@xend.co.jp",$message,$isConsult);//社長のアドレスのためテスト中はコメントアウトすること。
-        $result2 = sendMail($address,makeMailBody($name,$phone,$address,$isConsult,$consultContents));
+    if($items->errCheck()){
+        $result1 = sendMail("morita@xend.co.jp",$items->makeMailBody());//社長のアドレスのためテスト中はコメントアウトすること。
+        $result2 = sendMail($items->$address,$items->makeMailBody());
     }
     else{
         $failed = "ご入力内容に不備があります。";
@@ -104,8 +69,8 @@ echo <<<_END
         確認のためもう一度ご入力ください。{$notMatchErr}<br>
         <input type = "text" name = "readdress" value = "{$readdress}" size = "40"/><br>
         ご相談項目 (必須) {$isConsultEmptyErr}<br>
-        <input type = "radio" name = "isConsult" value = "1" $leftCheck />無料のご相談
-        <input type = "radio" name = "isConsult" value = "2" $rightCheck />その他のご質問 <br>
+        <input type = "radio" name = "consultTitle" value = "1" $leftCheck />無料のご相談
+        <input type = "radio" name = "consultTitle" value = "2" $rightCheck />その他のご質問 <br>
         ご相談内容 <br>
         <textarea name = "consultContents" cols = "40" rows = "5" wrap = "off">{$consultContents}</textarea><br>
         <input type = "button" onclick = "submit();" value = "この内容で送信"/>
