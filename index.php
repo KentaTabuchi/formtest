@@ -3,6 +3,7 @@
     require_once (dirname(__FILE__)."\class\Mailer.php");
     
     $items = new Items();
+<<<<<<< HEAD
     $mailer = new Mailer();
     $items->createErrorMessages();
 
@@ -10,12 +11,65 @@
         $leftCheck = 'checked';}
     else {
         $leftCheck = '';
+=======
+
+    $name = $items->name;
+    $phone = $items->phone;
+    $address = $items->address;
+    $readdress = $items->readdress;
+    $consultTitle = $items->consultTitle;
+    $consultContents = $items->consultContents;
+
+    if (empty($name)) {
+        $nameEmptyErr = "※未入力";}
+    else{
+        $nameEmptyErr = "";
+    }
+    if (empty($phone)) $phoneEmptyErr = "※未入力";
+    if (ctype_digit($phone) == false) $phoneNumericErr = "※ハイフン抜きで数字だけ入力てください。"; 
+    if (empty($address)) $addressEmptyErr = "※未入力";
+    if(preg_match('/..*@.*\..*/',$address) == false) $mailPatternErr = "※メールの形式になっていません。";
+    if (empty($consultTitle)) $isConsultEmptyErr = "※未入力";
+
+    if($items->address != $items->consultContents) {
+        $notMatchErr = "※アドレスが一致しません";
+    }else{
+        $notMatchErr = "";
+    }
+
+    if($items->consultTitle==1) $leftCheck = 'checked';
+        else $leftCheck = '';
+    if($items->consultTitle==2) $rightCheck = 'checked';
+        else $rightCheck = '';
+    
+    function sendMail($to,$message){
+        mb_language("Japanese");
+        mb_internal_encoding("UTF-8");
+
+        $title = "投稿を受理いたしました。";
+
+        if(mb_send_mail($to,$title,$message)){
+            $result = $to . "へのメールを送信しました。";
+        }
+        else{
+            $result = $to . "へのメール送信に失敗しました。";
+        } 
+        return $result;
+        
+>>>>>>> c8774d251b2a50cff33e565584ab5e55040d24a7
     }
     if($items->consultTitle==2) {
         $rightCheck = 'checked';
     }
+<<<<<<< HEAD
     else {
         $rightCheck = '';
+=======
+    else{
+        $result1 = "";
+        $result2 = "";
+        $failed = "ご入力内容に不備があります。";
+>>>>>>> c8774d251b2a50cff33e565584ab5e55040d24a7
     }
 
     $mailer->sendMail($items);
