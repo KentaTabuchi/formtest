@@ -62,11 +62,7 @@ class Items{
             $this->whereErr .= "電話番号に数字以外が入っています。</br>";
         }
         if($this->address != $this->readdress){
-<<<<<<< HEAD
             $this->whereErr .= "確認したアドレスと一致していません。</br>";
-=======
-            $isValidated = false;
->>>>>>> c8774d251b2a50cff33e565584ab5e55040d24a7
         }
         if(preg_match('/..*@.*\..*/',$this->address) == false){
             $this->whereErr .= "メールアドレスが間違っています。</br>";
