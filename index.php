@@ -1,7 +1,7 @@
 <?php
     require_once (dirname(__FILE__)."\class\Items.php");
     
-    $items = new Items($_POST);
+    $items = new Items();
 
     $name = $items->name;
     $phone = $items->phone;
@@ -10,18 +10,26 @@
     $consultTitle = $items->consultTitle;
     $consultContents = $items->consultContents;
 
-    if (empty($name)) $nameEmptyErr = "※未入力";
+    if (empty($name)) {
+        $nameEmptyErr = "※未入力";}
+    else{
+        $nameEmptyErr = "";
+    }
     if (empty($phone)) $phoneEmptyErr = "※未入力";
     if (ctype_digit($phone) == false) $phoneNumericErr = "※ハイフン抜きで数字だけ入力てください。"; 
     if (empty($address)) $addressEmptyErr = "※未入力";
     if(preg_match('/..*@.*\..*/',$address) == false) $mailPatternErr = "※メールの形式になっていません。";
     if (empty($consultTitle)) $isConsultEmptyErr = "※未入力";
 
-    if($items->address != $items->consultContents) $notMatchErr = "※アドレスが一致しません";
+    if($items->address != $items->consultContents) {
+        $notMatchErr = "※アドレスが一致しません";
+    }else{
+        $notMatchErr = "";
+    }
 
-    if($_POST['consultTitle']==1) $leftCheck = 'checked';
+    if($items->consultTitle==1) $leftCheck = 'checked';
         else $leftCheck = '';
-    if($_POST['consultTitle']==2) $rightCheck = 'checked';
+    if($items->consultTitle==2) $rightCheck = 'checked';
         else $rightCheck = '';
     
     function sendMail($to,$message){
@@ -45,6 +53,8 @@
         $result2 = sendMail($items->$address,$items->makeMailBody());
     }
     else{
+        $result1 = "";
+        $result2 = "";
         $failed = "ご入力内容に不備があります。";
     }
 

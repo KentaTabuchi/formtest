@@ -57,7 +57,7 @@ class Items{
         if(ctype_digit($this->phone) == false){
             $isValidated = false;
         }
-        if($this->$address != $this->readdress){
+        if($this->address != $this->readdress){
             $isValidated = false;
         }
         if(preg_match('/..*@.*\..*/',$this->address) == false){
